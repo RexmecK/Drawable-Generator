@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <title>Rexmeck Drawable Generator</title>
+    <body>
+        <h1 style = "font-family: Arial, Helvetica, sans-serif; text-align: center">Rexmeck Drawable Generator</h1>
+        <label style = "font-family: Arial, Helvetica, sans-serif;">Input: </label>
+        <div>
+            <button name="generate" onclick="generate()" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee">Generate</button>
+            <input type="file" id="input" accept="image/*" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee;">
+        </div>
+        <br>
+        <label style = "font-family: Arial, Helvetica, sans-serif;">Output: </label>
+        <textarea id="output" wrap="soft" style="max-width:max-content; min-width: 100%; resize: vertical;"> </textarea>
+    </body>
+    
+    <script>
+        //Util credits from people on stackoverflow
+        function componentToHex(c) {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        }
+
+        function rgbaToHex(r, g, b, a) {
+            return componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
+        }
+        //
+
+        //button callback
+        function generate(){
+            if(document.getElementById("input").files.length == 1) {
+                var reader = new FileReader();
+                var f = document.getElementById("input").files[0];
+                reader.onload = function(a) 
+                {
+                    var img = new Image;
+                    img.onload = function() {  document.getElementById("output").value = draw(img); } ;
+                    img.src = a.target.result;
+                }
+                reader.readAsDataURL(f);
+            }
+        }
+        
+        function draw(image) {
+            //we would create a canves to get pixel colors
+            var img = document.createElement('canvas');
+            img.width = image.width;
+            img.height = image.height;
+            img.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+            
+            var srcDirectory = "/assetmissing.png";
+            var srcSize = [64, 64];
+            
+            var signSize = [32, 8];
+            var signDirectory = "/objects/outpost/customsign/signplaceholder.png";
+            var signColors = [];
+
+            for(var x=0;x<=signSize[0];x++){
+                signColors[x] = [];
+                for(var y=0;y<=signSize[1];y++){
+                    signColors[x][y] = "";
+                    if(x < 10){ signColors[x][y] += "0" + x; } else { signColors[x][y] += x;}
+                    signColors[x][y] += "00";
+                    if(y < 10){ signColors[x][y] += "0" + y; } else { signColors[x][y] += y;}
+                    signColors[x][y] += "01";
+                }
+            }
+            //directives init
+            var directives = "?setcolor=ffff?replace;0000=ffff;fff0=ffff?scalenearest=" + (image.width / srcSize[0]) + ";" + (image.height / srcSize[1]);
+            
+            //calculates how much signs to be place x y
+            signs = [
+                Math.ceil(image.width / signSize[0]),
+                Math.ceil(image.height / signSize[1]),
+            ]
+
+            //iterate sign blocks
+            for(var sx = 0; sx < signs[0];sx++){
+                for(var sy = 0; sy < signs[1];sy++){
+
+                    //gets sign relative position to the image
+                    var spos = [sx * signSize[0], sy * signSize[1]];
+
+                    //new sign
+                    directives += "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace;000=000";
+                    
+                    //iterate pixels + sign blocks
+                    for(var x=1; x<=signSize[0];x++) 
+                    {
+                        for(var y=1; y<=signSize[1];y++)
+                        {
+                            //get pixel from pos
+                            var pix = img.getContext('2d').getImageData(spos[0] + x, img.height - (spos[1] + y - 1) , 1, 1).data;
+                            
+                            //avoids the full white to be removed after processing
+                            if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
+                                pix = [254,254,254,255]; 
+                            }
+
+                            // avoids image corruption
+                            if(pix[3] == 1)
+                                pix[3] = 2;
+                            
+                            //apply pixel
+                            directives += ";" + signColors[x][y] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+                        }
+                    }
+                }
+            }
+            
+            //final processing
+            directives += "?replace;ffffffff=00000000";
+            return srcDirectory + directives;
+        }
+
+    </script>
+</html> 
