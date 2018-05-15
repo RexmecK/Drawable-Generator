@@ -7,6 +7,13 @@
         <div>
             <button name="generate" onclick="generate()" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee">Generate</button>
             <input type="file" id="input" accept="image/*" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee;">
+            <br>
+            <label style = "font-family: Arial, Helvetica, sans-serif;">Src Image Path:</label>
+            <input type="text" id="srcPath" value="/assetmissing.png">
+            <br>
+            <label style = "font-family: Arial, Helvetica, sans-serif;">Src Image Size:</label>
+            <input type="number" id="srcX" value="64" min="1">
+            <input type="number" id="srcY" value="64" min="1">
         </div>
         <br>
         <label style = "font-family: Arial, Helvetica, sans-serif;">Output: </label>
@@ -53,7 +60,7 @@
 
         //button callback
         function generate(){
-            if(document.getElementById("input").files.length == 1) {
+            if(document.getElementById("input").files.length == 1 && document.getElementById("srcX").value > 0 && document.getElementById("srcY").value > 0) {
                 let reader = new FileReader();
                 let f = document.getElementById("input").files[0];
                 reader.onload = function(a) 
@@ -74,8 +81,8 @@
             context2d = img.getContext('2d');
             context2d.drawImage(image, 0, 0, image.width, image.height);
             
-            let srcDirectory = "/assetmissing.png";
-            let srcSize = [64, 64];
+            let srcDirectory = document.getElementById("srcPath").value;
+            let srcSize = [document.getElementById("srcX").value, document.getElementById("srcY").value];
             
             let signSize = [32, 8];
             let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
@@ -108,7 +115,7 @@
                     let spos = [sx * signSize[0], sy * signSize[1]];
 
                     //new sign
-                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace;000=000";
+                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace";
                     
                     hasColor = false;
                     
@@ -130,8 +137,8 @@
                             }
 
                             // avoids image corruption
-                            if(pix[3] == 1)
-                                pix[3] = 2;
+                            if(pix[3] == 1 && pix[1] == 0 && pix[0] < 33 && pix[2] < 9)
+                            {pix[3] = 2;}
                             
                             //apply pixel
                             sign += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
@@ -144,7 +151,7 @@
             }
             
             //final processing
-            directives += "?replace;ffffffff=00000000";
+            directives += "?replace;ffff=0000";
             return srcDirectory + directives;
         }
 
