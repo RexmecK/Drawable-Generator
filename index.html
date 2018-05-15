@@ -119,8 +119,8 @@
                     let spos = [sx * signSize[0], sy * signSize[1]];
 
                     //new sign
-                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace";
-                    
+                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]);
+                    let palletes = "?replace";
                     hasColor = false;
                     
                     //iterate pixels + sign blocks
@@ -151,13 +151,13 @@
                                     
                                 }
                                 else{
-                                    sign += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+                                    palletes += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
                                 }
                             }
                         }
                     }
-                    if (hasColor){
-                        directives += sign;
+                    if (hasColor && palletes != "?replace"){
+                        directives += sign + palletes;
                     }
                 }
             }
