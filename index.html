@@ -133,7 +133,7 @@
                                 //get pixel from pos
                                 let pix = context2d.getImageData(spos[0] + x, img.height - (spos[1] + y + 1) , 1, 1).data;
 
-                                if(pix[3] > 0) {
+                                if(pix[3] > 0 || document.getElementById("ctrans").checked) {
                                     hasColor = true;
                                 }
 
