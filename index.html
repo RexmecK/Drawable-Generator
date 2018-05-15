@@ -19,8 +19,34 @@
             var hex = c.toString(16);
             return hex.length == 1 ? "0" + hex : hex;
         }
+        
+        function hexEnd0(v) {
+            for(var i=0;i<16;i++){
+                if(v == i * 16) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         function rgbaToHex(r, g, b, a) {
+            //very bad coding here
+
+            if(r == 0 && g == 0 && b == 0 && a == 0) {
+                return "0000";
+            }
+
+            if(hexEnd0(r) && hexEnd0(g) && hexEnd0(b)) {
+                if (a == 255) {
+                    return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1);
+                }
+                else{
+                    if(hexEnd0(a)){
+                        return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1) + componentToHex(a).substring(0, 1);
+                    }
+                }
+            }
+
             return componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
         }
         //
@@ -28,11 +54,11 @@
         //button callback
         function generate(){
             if(document.getElementById("input").files.length == 1) {
-                var reader = new FileReader();
-                var f = document.getElementById("input").files[0];
+                let reader = new FileReader();
+                let f = document.getElementById("input").files[0];
                 reader.onload = function(a) 
                 {
-                    var img = new Image;
+                    let img = new Image;
                     img.onload = function() {  document.getElementById("output").value = draw(img); } ;
                     img.src = a.target.result;
                 }
@@ -42,21 +68,22 @@
         
         function draw(image) {
             //we would create a canves to get pixel colors
-            var img = document.createElement('canvas');
+            let img = document.createElement('canvas');
             img.width = image.width;
             img.height = image.height;
-            img.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+            context2d = img.getContext('2d');
+            context2d.drawImage(image, 0, 0, image.width, image.height);
             
-            var srcDirectory = "/assetmissing.png";
-            var srcSize = [64, 64];
+            let srcDirectory = "/assetmissing.png";
+            let srcSize = [64, 64];
             
-            var signSize = [32, 8];
-            var signDirectory = "/objects/outpost/customsign/signplaceholder.png";
-            var signColors = [];
+            let signSize = [32, 8];
+            let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
+            let signColors = [["00000001"]];
 
-            for(var x=0;x<=signSize[0];x++){
+            for(let x=1;x<=signSize[0];x++){
                 signColors[x] = [];
-                for(var y=0;y<=signSize[1];y++){
+                for(let y=1;y<=signSize[1];y++){
                     signColors[x][y] = "";
                     if(x < 10){ signColors[x][y] += "0" + x; } else { signColors[x][y] += x;}
                     signColors[x][y] += "00";
@@ -65,7 +92,7 @@
                 }
             }
             //directives init
-            var directives = "?setcolor=ffff?replace;0000=ffff;fff0=ffff?scalenearest=" + (image.width / srcSize[0]) + ";" + (image.height / srcSize[1]);
+            let directives = "?setcolor=ffff?replace;0000=ffff;fff0=ffff?scalenearest=" + (image.width / srcSize[0]) + ";" + (image.height / srcSize[1]);
             
             //calculates how much signs to be place x y
             signs = [
@@ -74,23 +101,29 @@
             ]
 
             //iterate sign blocks
-            for(var sx = 0; sx < signs[0];sx++){
-                for(var sy = 0; sy < signs[1];sy++){
+            for(let sx = 0; sx < signs[0];sx++){
+                for(let sy = 0; sy < signs[1];sy++){
 
                     //gets sign relative position to the image
-                    var spos = [sx * signSize[0], sy * signSize[1]];
+                    let spos = [sx * signSize[0], sy * signSize[1]];
 
                     //new sign
-                    directives += "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace;000=000";
+                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]) + "?replace;000=000";
+                    
+                    hasColor = false;
                     
                     //iterate pixels + sign blocks
-                    for(var x=1; x<=signSize[0];x++) 
+                    for(let x=0; x<signSize[0];x++) 
                     {
-                        for(var y=1; y<=signSize[1];y++)
+                        for(let y=0; y<signSize[1];y++)
                         {
                             //get pixel from pos
-                            var pix = img.getContext('2d').getImageData(spos[0] + x, img.height - (spos[1] + y - 1) , 1, 1).data;
+                            let pix = context2d.getImageData(spos[0] + x, img.height - (spos[1] + y + 1) , 1, 1).data;
                             
+                            if(pix[3] > 0) {
+                                hasColor = true;
+                            }
+
                             //avoids the full white to be removed after processing
                             if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
                                 pix = [254,254,254,255]; 
@@ -101,14 +134,18 @@
                                 pix[3] = 2;
                             
                             //apply pixel
-                            directives += ";" + signColors[x][y] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+                            sign += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
                         }
+                    }
+                    if (hasColor){
+                        directives += sign;
                     }
                 }
             }
             
             //final processing
-            directives += "?replace;ffffffff=00000000";
+            //directives += "?replace;ffffffff=00000000";
+            directives += "?replace;0000=ffff";
             return srcDirectory + directives;
         }
 
