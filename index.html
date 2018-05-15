@@ -16,6 +16,8 @@
             <input type="number" id="srcY" value="64" min="1">
             <br>
             <input type="checkbox" id="btrans">Bypass transparent on last signplaceholder</input>
+            <br>
+            <input type="checkbox" id="ctrans">Retain color value even if transparent</input>
         </div>
         <br>
         <label style = "font-family: Arial, Helvetica, sans-serif;">Output: </label>
@@ -41,7 +43,7 @@
         function rgbaToHex(r, g, b, a) {
             //very bad coding here
 
-            if(r == 0 && g == 0 && b == 0 && a == 0) {
+            if(a == 0 && !document.getElementById("ctrans").checked) {
                 return "0000";
             }
 
