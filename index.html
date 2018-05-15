@@ -14,6 +14,8 @@
             <label style = "font-family: Arial, Helvetica, sans-serif;">Src Image Size:</label>
             <input type="number" id="srcX" value="64" min="1">
             <input type="number" id="srcY" value="64" min="1">
+            <br>
+            <input type="checkbox" id="btrans">Bypass transparent on last signplaceholder</input>
         </div>
         <br>
         <label style = "font-family: Arial, Helvetica, sans-serif;">Output: </label>
@@ -88,9 +90,9 @@
             let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
             let signColors = [["00000001"]];
 
-            for(let x=1;x<=signSize[0];x++){
-                signColors[x] = [];
-                for(let y=1;y<=signSize[1];y++){
+                for(let x=1;x<=signSize[0];x++){
+                    signColors[x] = [];
+            for(let y=1;y<=signSize[1];y++){
                     signColors[x][y] = "";
                     if(x < 10){ signColors[x][y] += "0" + x; } else { signColors[x][y] += x;}
                     signColors[x][y] += "00";
@@ -108,8 +110,8 @@
             ]
 
             //iterate sign blocks
-            for(let sx = 0; sx < signs[0];sx++){
                 for(let sy = 0; sy < signs[1];sy++){
+            for(let sx = 0; sx < signs[0];sx++){
 
                     //gets sign relative position to the image
                     let spos = [sx * signSize[0], sy * signSize[1]];
@@ -124,24 +126,32 @@
                     {
                         for(let y=0; y<signSize[1];y++)
                         {
-                            //get pixel from pos
-                            let pix = context2d.getImageData(spos[0] + x, img.height - (spos[1] + y + 1) , 1, 1).data;
-                            
-                            if(pix[3] > 0) {
-                                hasColor = true;
-                            }
+                            if (img.height > (spos[1] + y) && img.width > (spos[0] + x))
+                            {
+                                //get pixel from pos
+                                let pix = context2d.getImageData(spos[0] + x, img.height - (spos[1] + y + 1) , 1, 1).data;
 
-                            //avoids the full white to be removed after processing
-                            if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
-                                pix = [254,254,254,255]; 
-                            }
+                                if(pix[3] > 0) {
+                                    hasColor = true;
+                                }
 
-                            // avoids image corruption
-                            if(pix[3] == 1 && pix[1] == 0 && pix[0] < 33 && pix[2] < 9)
-                            {pix[3] = 2;}
-                            
-                            //apply pixel
-                            sign += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+                                //avoids the full white to be removed after processing
+                                if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
+                                    pix = [254,254,254,255]; 
+                                }
+
+                                // avoids image corruption
+                                if(pix[3] == 1 && pix[1] == 0 && pix[0] < 33 && pix[2] < 9)
+                                {pix[3] = 2;}
+
+                                //apply pixel
+                                if(sx + 1==signs[0] && sy + 1==signs[1] && pix[3] == 0 && document.getElementById("btrans").checked){
+                                    
+                                }
+                                else{
+                                    sign += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+                                }
+                            }
                         }
                     }
                     if (hasColor){
