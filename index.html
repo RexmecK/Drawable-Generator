@@ -1,27 +1,69 @@
 <!DOCTYPE html>
 <html>
-    <title>Rexmeck Drawable Generator</title>
+
+    <head>
+        <title>Rexmeck Drawable Generator</title>
+        <style>
+            .default-font {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 16px;
+            }
+            
+            .default-button {
+                color: #111; 
+                border: 2px solid #888; 
+                border-radius: 4px; 
+                background-color: #eee;
+            }
+            
+            .header {
+                overflow: hidden;
+                background-color: #232323;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0%;
+                max-height: 60px;
+                z-index: 99;
+                position: fixed;
+            }
+
+            .middle-align {
+                overflow: hidden;
+                margin-left: 5%;
+                margin-right: 5%;
+            }
+        </style>
+    </head>
+    
     <body>
-        <h1 style = "font-family: Arial, Helvetica, sans-serif; text-align: center">Rexmeck Drawable Generator</h1>
-        <label style = "font-family: Arial, Helvetica, sans-serif;">Input: </label>
-        <div>
-            <button name="generate" onclick="generate()" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee">Generate</button>
-            <input type="file" id="input" accept="image/*" style="color: #111; border: 2px solid #888; border-radius: 4px; background-color: #eee;">
-            <br>
-            <label style = "font-family: Arial, Helvetica, sans-serif;">Src Image Path:</label>
-            <input type="text" id="srcPath" value="/assetmissing.png">
-            <br>
-            <label style = "font-family: Arial, Helvetica, sans-serif;">Src Image Size:</label>
-            <input type="number" id="srcX" value="64" min="1">
-            <input type="number" id="srcY" value="64" min="1">
-            <br>
-            <input type="checkbox" id="btrans">Bypass transparent on last signplaceholder</input>
-            <br>
-            <input type="checkbox" id="ctrans">Retain color value even if transparent</input>
+        <div class="header">
+            <div class="middle-align" style="padding-top: 20px;background-color: #323232; box-shadow: 0px 0px 5px black; min-height: 80px;">
+                <p align="center" style="font-size: 18px 50%; color: white;" class="default-font">Rexmeck Drawable Generator</p>
+            </div>
         </div>
-        <br>
-        <label style = "font-family: Arial, Helvetica, sans-serif;">Output: </label>
-        <textarea id="output" wrap="soft" style="max-width:max-content; min-width: 100%; resize: vertical;"> </textarea>
+        <div class="middle-align" style="padding-top: 60px; box-shadow: 0px 0px 5px black; background-color: #fafafa; min-width: 120px;">
+            <div style="padding-left: 8px; padding-right: 8px;">
+                <label class="default-font">Input: </label>
+                <br>
+                <button name="generate" onclick="generate()" class="default-button">Generate</button>
+                <input type="file" id="input" accept="image/*" class="default-button">
+                <br>
+                <label class="default-font">Src Image Path:</label>
+                <input type="text" id="srcPath" value="/assetmissing.png">
+                <br>
+                <label class="default-font">Src Image Size:</label>
+                <input type="number" id="srcX" value="64" min="1">
+                <input type="number" id="srcY" value="64" min="1">
+                <br>
+                <input type="checkbox" id="btrans" class="default-font">Bypass transparent on last signplaceholder</input>
+                <br>
+                <input type="checkbox" id="ctrans" class="default-font">Retain color value even if transparent</input>
+                <br>
+                <label class="default-font">Output: </label>
+                <textarea id="output" wrap="soft" style="max-width:100%; min-width: 100%; resize: vertical;"> </textarea>
+            </div>
+        </div>
     </body>
     
     <script>
