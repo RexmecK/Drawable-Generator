@@ -49,7 +49,7 @@
     
     <body>
         <div class="header">
-            <p align="center" style="font-size: 24px; color:#808080; font-family: Arial, Helvetica, sans-serif; margin-top: 15px;">Rexmeck Drawable Generator</p>
+            <h1 align="center" style="font-size: 24px; color:#808080; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-weight: normal; margin-top: 15px;">Rexmeck Drawable Generator</h1>
         </div>
         <!--Main page-->
         <div style="padding-top:30px"></div>
@@ -61,16 +61,20 @@
                 <input type="file" id="input" accept="image/*" class="default-button">
                 <label id="generating" class="default-font" >Generating...</label>
                 <br>
-                <label class="default-font">Src Image Path:</label>
-                <input type="text" id="srcPath" value="/assetmissing.png">
+                <label class="default-font">Source Image Path:</label>
                 <br>
-                <label class="default-font">Src Image Size:</label>
+                <input type="text" id="srcPath" value="/assetmissing.png" title="Change our base sprite to make drawables on. Its recommended to use the default">
+                <br>
+                <label class="default-font">Source Image Size:</label>
+                <br>
                 <input type="number" id="srcX" value="64" min="1">
                 <input type="number" id="srcY" value="64" min="1">
                 <br>
-                <input type="checkbox" id="btrans" class="default-font">Bypass transparent on last signplaceholder</input>
+                <input type="checkbox" id="btrans" class="default-font" title="The last sign will not have extra processing to remove his color coords (saving some data)"></input>
+                <label class="default-font">Bypass transparent on last signplaceholder</label>
                 <br>
-                <input type="checkbox" id="ctrans" class="default-font">Retain color value even if transparent</input>
+                <input type="checkbox" id="ctrans" class="default-font" title="Takes full transparent with color codes instead of turning it into 0000."></input>
+                <label class="default-font">Retain color value even if transparent</label>
                 <br>
                 <label class="default-font">Output: </label>
                 <textarea id="output" wrap="soft" style="max-width:100%; min-width: 100%; resize: vertical;"> </textarea>
