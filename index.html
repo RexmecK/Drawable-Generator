@@ -15,39 +15,51 @@
                 border-radius: 4px; 
                 background-color: #eee;
             }
-            
+
+            body {
+              height: 100vh;
+              margin: 0;
+              padding: 0;
+              position: relative;
+            }
+
             .header {
                 overflow: hidden;
-                background-color: #232323;
+                background-color: #202020;
                 top: 0;
                 left: 0;
                 right: 0;
-                bottom: 0%;
+                bottom: 100%;
+                min-height: 60px;
                 max-height: 60px;
                 z-index: 99;
-                position: fixed;
             }
 
+            #generating {
+                display: none;
+            }
             .middle-align {
                 overflow: hidden;
-                margin-left: 5%;
-                margin-right: 5%;
+                max-width: 60%;
+                margin-left: 20%;
             }
+
         </style>
     </head>
     
     <body>
         <div class="header">
-            <div class="middle-align" style="padding-top: 20px;background-color: #323232; box-shadow: 0px 0px 5px black; min-height: 80px;">
-                <p align="center" style="font-size: 18px 50%; color: white;" class="default-font">Rexmeck Drawable Generator</p>
-            </div>
+            <p align="center" style="font-size: 24px; color:#808080; font-family: Arial, Helvetica, sans-serif; margin-top: 15px;">Rexmeck Drawable Generator</p>
         </div>
-        <div class="middle-align" style="padding-top: 60px; box-shadow: 0px 0px 5px black; background-color: #fafafa; min-width: 120px;">
-            <div style="padding-left: 8px; padding-right: 8px;">
+        <!--Main page-->
+        <div style="padding-top:30px"></div>
+        <div class="middle-align" style="padding-top: 30px; box-shadow: 0px 10px 40px 10px #00000040; background-color: #fafafa; min-width: 120px;">
+            <div style="padding-left: 3.5%; padding-right: 5%;">
                 <label class="default-font">Input: </label>
                 <br>
                 <button name="generate" onclick="generate()" class="default-button">Generate</button>
                 <input type="file" id="input" accept="image/*" class="default-button">
+                <label id="generating" class="default-font" >Generating...</label>
                 <br>
                 <label class="default-font">Src Image Path:</label>
                 <input type="text" id="srcPath" value="/assetmissing.png">
@@ -62,11 +74,14 @@
                 <br>
                 <label class="default-font">Output: </label>
                 <textarea id="output" wrap="soft" style="max-width:100%; min-width: 100%; resize: vertical;"> </textarea>
+                <div style="padding-top: 30px;"></div>
             </div>
         </div>
     </body>
     
     <script>
+        var ready = true
+
         //Util credits from people on stackoverflow
         function componentToHex(c) {
             var hex = c.toString(16);
@@ -106,17 +121,34 @@
 
         //button callback
         function generate(){
-            if(document.getElementById("input").files.length == 1 && document.getElementById("srcX").value > 0 && document.getElementById("srcY").value > 0) {
+            let outputText = document.getElementById("output");
+            let generatingtext = document.getElementById("generating");
+            outputText.value = "";
+
+            generatingtext.style.display = "initial";
+            
+            if (ready && document.getElementById("input").files.length == 1 && document.getElementById("srcX").value > 0 && document.getElementById("srcY").value > 0) {
+                ready = false
                 let reader = new FileReader();
                 let f = document.getElementById("input").files[0];
                 reader.onload = function(a) 
                 {
                     let img = new Image;
-                    img.onload = function() {  document.getElementById("output").value = draw(img); } ;
+                    img.onload = function() { 
+                        document.getElementById("output").value = draw(img); 
+                        generatingtext.style.display = "none";
+                        ready = true
+                    } ;
                     img.src = a.target.result;
                 }
                 reader.readAsDataURL(f);
             }
+            else
+            {
+                generatingtext.style.display = "none";
+            }
+            
+            
         }
         
         function draw(image) {
@@ -134,9 +166,9 @@
             let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
             let signColors = [["00000001"]];
 
-                for(let x=1;x<=signSize[0];x++){
-                    signColors[x] = [];
-            for(let y=1;y<=signSize[1];y++){
+            for(let x=1;x<=signSize[0];x++){
+                signColors[x] = [];
+                for(let y=1;y<=signSize[1];y++){
                     signColors[x][y] = "";
                     if(x < 10){ signColors[x][y] += "0" + x; } else { signColors[x][y] += x;}
                     signColors[x][y] += "00";
@@ -179,14 +211,16 @@
                                     hasColor = true;
                                 }
 
-                                //avoids the full white to be removed after processing
-                                if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
-                                    pix = [254,254,254,255]; 
-                                }
-
                                 // avoids image corruption
                                 if(pix[3] == 1 && pix[1] == 0 && pix[0] < 33 && pix[2] < 9)
-                                {pix[3] = 2;}
+                                {
+                                    pix[3] = 2;
+                                }
+
+                                //avoids the full white to be removed after processing and it will be restored
+                                if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
+                                    pix = [01,02,01,01]; 
+                                }
 
                                 //apply pixel
                                 if(sx + 1==signs[0] && sy + 1==signs[1] && pix[3] == 0 && document.getElementById("btrans").checked){
@@ -205,7 +239,7 @@
             }
             
             //final processing
-            directives += "?replace;ffff=0000";
+            directives += "?replace;ffff=0000;01020101=ffff";
             return srcDirectory + directives;
         }
 
