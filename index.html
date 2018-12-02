@@ -6,7 +6,7 @@
         <style>
             .default-font {
                 font-family: Arial, Helvetica, sans-serif;
-                font-size: 16px;
+                font-size: 0.5cm;
             }
             
             .default-button {
@@ -30,8 +30,7 @@
                 left: 0;
                 right: 0;
                 bottom: 100%;
-                min-height: 60px;
-                max-height: 60px;
+                max-height: 8cm;
                 z-index: 99;
             }
 
@@ -40,8 +39,9 @@
             }
             .middle-align {
                 overflow: hidden;
-                max-width: 60%;
-                margin-left: 20%;
+                max-width: 960px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
         </style>
@@ -49,7 +49,7 @@
     
     <body>
         <div class="header">
-            <h1 align="center" style="font-size: 24px; color:#808080; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-weight: normal; margin-top: 15px;">Rexmeck Drawable Generator</h1>
+            <h1 align="center" style="font-size: 1cm; color:#808080; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-weight: normal; margin-top: 15px;">Rexmeck Drawable Generator</h1>
         </div>
         <!--Main page-->
         <div style="padding-top:30px"></div>
@@ -63,12 +63,12 @@
                 <br>
                 <label class="default-font">Source Image Path:</label>
                 <br>
-                <input type="text" id="srcPath" value="/assetmissing.png" title="Change our base sprite to make drawables on. Its recommended to use the default">
+                <input type="text" id="srcPath" value="/assetmissing.png" class="default-font" title="Change our base sprite to make drawables on. Its recommended to use the default">
                 <br>
                 <label class="default-font">Source Image Size:</label>
                 <br>
-                <input type="number" id="srcX" value="64" min="1">
-                <input type="number" id="srcY" value="64" min="1">
+                <input class="default-font" type="number" id="srcX" value="64" min="1">
+                <input class="default-font" type="number" id="srcY" value="64" min="1">
                 <br>
                 <input type="checkbox" id="btrans" class="default-font" title="The last sign will not have extra processing to remove his color coords (saving some data)"></input>
                 <label class="default-font">Bypass transparent on last signplaceholder</label>
