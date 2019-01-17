@@ -106,6 +106,10 @@
 
         function rgbaToHex(r, g, b, a) {
             //very bad coding here
+            r = Math.min(r,255);
+            g = Math.min(g,255);
+            b = Math.min(b,255);
+            a = Math.min(a,255);
 
             if(a == 0 && !document.getElementById("ctrans").checked) {
                 return "0000";
@@ -128,7 +132,10 @@
         }
 
         function rgbaToHexNoTransparentCheck(r, g, b, a) {
-
+            r = Math.min(r,255);
+            g = Math.min(g,255);
+            b = Math.min(b,255);
+            a = Math.min(a,255);
             if(hexEnd0(r) && hexEnd0(g) && hexEnd0(b)) {
                 if (a == 255) {
                     return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1);
@@ -184,17 +191,10 @@
             
             
         }
-        
 
-        function stepsScales(x)
+        function stepsize(x)
         {
-            return  Math.ceil(Math.min(x, 256) / 128) * 128; //going lower than 128 causes some artifacts
-        }
-
-        function lineargradient(x,y,scale)
-        {
-            let fixedscale = stepsScales(scale);
-            return  [Math.floor((x) * (255/fixedscale)), Math.floor((y) * (255/fixedscale))];
+            return Math.ceil(Math.min(x, 256) / 128) * 128;
         }
 
         function drawFade(image) {
@@ -204,30 +204,33 @@
             context2d = img.getContext('2d');
             context2d.drawImage(image, 0,0);
 
-            let biggest = Math.max(image.width, image.height)
-
+            let fixsize = [stepsize(image.width), stepsize(image.height)];
             let srcDirectory = document.getElementById("srcPath").value;
             let srcSize = [document.getElementById("srcX").value, document.getElementById("srcY").value];
-            let directives = "?crop=;0;0;1;1?setcolor=fff?replace;0000=0a00;fff0=0a00;fff=0a00?scalenearest=2?blendscreen=/objects/outpost/customsign/signplaceholder.png?replace;01aa0000=fa00;00aa0100=0af0;01aa0100=faf0"
+            let directives = "?crop=;0;0;1;1?setcolor=fff?replace;0000=0a00;fff0=0a00;fff=0a00?scalenearest=2?blendscreen=/objects/outpost/customsign/signplaceholder.png"
             
+            //setgradient
+            directives += //"?replace;0a00=" + rgbaToHexNoTransparentCheck(0, 170, 0,0) +
+                        "?replace;01aa0000=" + rgbaToHexNoTransparentCheck(fixsize[0], 170, 0,0) +
+                        ";00aa0100=" + rgbaToHexNoTransparentCheck(0, 170, fixsize[1], 0) +
+                        ";01aa0100=" + rgbaToHexNoTransparentCheck(fixsize[0], 170, fixsize[1], 0);
+
             //setoptimizedsize
-            let scaling = stepsScales(biggest + 1);
-            directives += "?scale=" + scaling;
+            directives += "?scale=" + (fixsize[0]) + ";" + (fixsize[1]); 
             //size
-            directives += "?crop=1;1;" + (image.width + 1) + ";" + (image.height + 1);
+            directives += "?crop=" + Math.round(fixsize[0]/512) + ";" + Math.round(fixsize[1]/512) + ";" + (image.width + Math.round(fixsize[0]/512)) + ";" + (image.height + Math.round(fixsize[1]/512));
 
             let palletes = ""
 
-            for(let sy = 1; sy <= image.height; sy++)
-                {
-            for(let sx = 1; sx <= image.width; sx++)
+            for(let sx = 1; sx <= image.width + 1; sx++)
             {
+                for(let sy = 1; sy <= image.height + 1; sy++)
+                {
                     let ssx = sx - 1
                     let ssy = image.height - sy
                     let pix = context2d.getImageData(ssx, ssy, 1, 1).data;
                     if (pix[3] > 0){ 
-                        let calculatedpalette = lineargradient(sx, sy, scaling);
-                        palletes += ";" + rgbaToHexNoTransparentCheck(calculatedpalette[0],170,calculatedpalette[1],0) + "=" + rgbaToHex(pix[0], pix[1], pix[2], pix[3]);
+                        palletes += ";" + rgbaToHexNoTransparentCheck(sx - Math.round(fixsize[0]/256),170,sy - Math.round(fixsize[1]/256),0) + "=" + rgbaToHex(pix[0], pix[1], pix[2], pix[3]);
                     }
                     else{
                     }
