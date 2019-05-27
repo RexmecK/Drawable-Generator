@@ -93,6 +93,10 @@
                 <input type="text" id="greenIndex" value="aa" maxlength="2" class="default-font" style="max-width:36px; min-width: 0%;" title="Useful for animated drawables">
                 <br>
                 <br>
+                <input type="checkbox" id="checkboxcompresscolor" class="default-font" title="round color values to smaller hex color"></input>
+                <label class="default-font">Color Compression</label>
+                <br>
+                <br>
                 <input type="checkbox" id="checkboxlegacy" class="default-font" title="Use old method if the new method doesn't work properly"></input>
                 <label class="default-font">Generate (legacy drawables)</label>
                 <br>
@@ -224,6 +228,16 @@
             return Math.ceil(Math.min(x, 256) / 128) * 128;
         }
 
+        function compressColor(c)
+        {
+            return [
+                Math.round(c[0] / 17) * 17,
+                Math.round(c[1] / 17) * 17,
+                Math.round(c[2] / 17) * 17,
+                Math.round(c[3] / 17) * 17,
+            ]
+        }
+
         function drawFade(image) {
             let img = document.createElement('canvas');
             img.width = image.width + 2;
@@ -259,6 +273,9 @@
                     let ssy = image.height - sy
                     let pix = context2d.getImageData(ssx, ssy, 1, 1).data;
                     if (pix[3] > 0){ 
+                        if (document.getElementById("checkboxcompresscolor").checked){
+                            pix = compressColor(pix)
+                        }
                         palletes += ";" + rgbaToHexNoTransparentCheck(sx - Math.round(fixsize[0]/256), greenIndex, sy - Math.round(fixsize[1]/256),0) + "=" + rgbaToHex(pix[0], pix[1], pix[2], pix[3]);
                     }
                     else{
@@ -345,9 +362,16 @@
 
                                 //apply pixel
                                 if(sx + 1==signs[0] && sy + 1==signs[1] && pix[3] == 0 && document.getElementById("btrans").checked){
-                                    
+                                    if (document.getElementById("checkboxcompresscolor").checked){
+                                        pix = compressColor(pix)
+                                    }
+                                    palletes += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
                                 }
-                                else{
+                                else
+                                {
+                                    if (document.getElementById("checkboxcompresscolor").checked){
+                                        pix = compressColor(pix)
+                                    }
                                     palletes += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
                                 }
                             }
