@@ -1,424 +1,407 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <title>Rexmeck Drawable Generator</title>
-        <style>
-            .default-font {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 0.5cm;
-                font-weight:lighter;
-            }
-            
-            .default-button {
-                color: #111; 
-                border: 2px solid #888; 
-                border-radius: 4px; 
-                background-color: #eee;
-            }
+	<head>
+		<title>Rexmeck Drawable Generator</title>
+		<style>
+			.default-font {
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 0.5cm;
+				font-weight:lighter;
+			}
+			
+			.default-button {
+				color: #111; 
+				border: 2px solid #888; 
+				border-radius: 4px; 
+				background-color: #eee;
+			}
 
-            body {
-              height: 100vh;
-              margin: 0;
-              background-color: #000; 
-              padding: 0;
-              position: relative;
-            }
+			body {
+			  height: 100vh;
+			  margin: 0;
+			  background-color: #000; 
+			  padding: 0;
+			  position: relative;
+			}
 
-            .header {
-                overflow: hidden;
-                background-color: #202020;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 100%;
-                max-height: 8cm;
-                z-index: 99;
-            }
+			.header {
+				overflow: hidden;
+				background-color: #202020;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 100%;
+				max-height: 8cm;
+				z-index: 99;
+			}
 
-            #generating {
-                display: none;
-            }
-            .middle-align {
-                overflow: hidden;
-                max-width: 960px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            
-            .shadow {
-                box-shadow: 0px 20px 20px 0px #00000040;
-            }
+			#generating {
+				display: none;
+			}
+			.middle-align {
+				overflow: hidden;
+				max-width: 960px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+			
+			.shadow {
+				box-shadow: 0px 20px 20px 0px #00000040;
+			}
 
-            .page-element {
-                margin-top: 30px;
-                padding-top: 30px;
-                padding-bottom: 30px;
-            }
+			.page-element {
+				margin-top: 30px;
+				padding-top: 30px;
+				padding-bottom: 30px;
+			}
 
-        </style>
-    </head>
-    
-    <body>
-        <div class="header shadow">
-            <h1 align="center" class="default-font" style="font-size: 1cm; color:#808080; margin-top: 15px;">Rexmeck Drawable Generator</h1>
-        </div>
-        <!--Main page-->
-        <div class="middle-align shadow page-element" style="background-color: #fafafa; min-width: 120px;">
-            <div style="padding-left: 3.5%; padding-right: 5%;">
-                <label class="default-font">Input: </label>
-                <br>
-                <button name="generate" onclick="generate()" class="default-button">Generate</button>
-                <input type="file" id="input" accept="image/*" class="default-button">
-                <label id="generating" class="default-font" >Generating...</label>
-                <br>
-                <br>
-                <label class="default-font">Output: </label>
-                <br>
-                <br>
-                <textarea id="output" wrap="soft" spellcheck="false" style="max-width:100%; min-width: 100%; height: 250px; resize: vertical;"> </textarea>
-            </div>
-        </div>
-        
-        <div class="middle-align shadow page-element" style=" background-color: #fafafa; min-width: 120px;">
-            <div style="padding-left: 3.5%; padding-right: 5%;">
-                <h1 align="center" class="default-font">Advanced Settings</h1>
-                <br>
-                <label class="default-font">Source Image Path:</label>
-                <br>
-                <input type="text" id="srcPath" value="/assetmissing.png" class="default-font" style="max-width:100%; min-width: 100%;" title="Change our base sprite to make drawables on. Its recommended to use the default">
-                <br>
-                <br>
-                <label class="default-font">Green Index</label>
-                <input type="text" id="greenIndex" value="aa" maxlength="2" class="default-font" style="max-width:36px; min-width: 0%;" title="Useful for animated drawables">
-                <br>
-                <br>
-                <input type="checkbox" id="checkboxcompresscolor" class="default-font" title="round color values to smaller hex color"></input>
-                <label class="default-font">Color Compression</label>
-                <br>
-                <br>
-                <input type="checkbox" id="checkboxlegacy" class="default-font" title="Use old method if the new method doesn't work properly"></input>
-                <label class="default-font">Generate (legacy drawables)</label>
-                <br>
-                <br>
-                <label class="default-font">Source Image Size (legacy  drawables):</label>
-                <input class="default-font" type="number" id="srcX" value="64" min="1">
-                <input class="default-font" type="number" id="srcY" value="64" min="1">
-                <br>
-                <br>
-                <input type="checkbox" id="btrans" class="default-font" title="The last sign will not have transparent coords removal (slightly saves some data)"></input>
-                <label class="default-font" >Bypass transparent on last signplaceholder (legacy drawables)</label>
-                <input type="checkbox" id="ctrans" class="default-font" style="display: none;"title="Takes full transparent with color codes instead of turning it into 0000."></input>
-                <label class="default-font" style="display: none;">Retain color value even if transparent</label>
-                <br>
-                <br>
-            </div>
-        </div>
+		</style>
+	</head>
+	
+	<body>
+		<div class="header shadow">
+			<h1 align="center" class="default-font" style="font-size: 1cm; color:#808080; margin-top: 15px;">Rexmeck Drawable Generator</h1>
+		</div>
+		<!--Main page-->
+		<div class="middle-align shadow page-element" style="background-color: #fafafa; min-width: 120px;">
+			<div style="padding-left: 3.5%; padding-right: 5%;">
+				<label class="default-font">Input: </label>
+				<br>
+				<button name="generate" onclick="generate()" class="default-button">Generate</button>
+				<input type="file" id="input" accept="image/*" class="default-button">
+				<label id="generating" class="default-font" ></label>
+				<br>
+				<br>
+				<label class="default-font">Output: </label>
+				<br>
+				<br>
+				<textarea id="output" wrap="soft" spellcheck="false" style="max-width:100%; min-width: 100%; height: 250px; resize: vertical;"> </textarea>
+			</div>
+		</div>
+		
+		<div class="middle-align shadow page-element" style=" background-color: #fafafa; min-width: 120px;">
+			<div style="padding-left: 3.5%; padding-right: 5%;">
+				<h1 align="center" class="default-font">Advanced Settings</h1>
+				<br>
+				<label class="default-font">Source Image Path:</label>
+				<br>
+				<input type="text" id="srcPath" value="/assetmissing.png" class="default-font" style="max-width:100%; min-width: 100%;" title="Change our base sprite to make drawables on. Its recommended to use the default">
+				<br>
+				<br>
+				<label class="default-font">Green Index</label>
+				<input type="text" id="greenIndex" value="00" maxlength="2" class="default-font" style="max-width:36px; min-width: 0%;" title="Useful for animated drawables">
+				<br>
+				<br>
+				<input type="checkbox" id="checkboxcompresscolor" class="default-font" title="Round color values to smaller hex color"></input>
+				<label class="default-font">Color Compression</label>
+				<br>
+				<br>
+				<input type="checkbox" id="checkboxpixelmapdata" class="default-font" title="Useful for animated drawables (experimental!)"></input>
+				<label class="default-font">Pixel map data only</label>
+				<br>
+				<br>
+				<h1 align="center" class="default-font">Legacy Settings</h1>
+				<br>
+				<input type="checkbox" id="checkboxlegacy" class="default-font" title="Use old method if the new method doesn't work properly"></input>
+				<label class="default-font">Generate legacy drawables</label>
+				<br>
+				<br>
+				<input type="checkbox" id="btrans" class="default-font" title="The last sign will not have transparent coords removal (slightly saves some data)"></input>
+				<label class="default-font" >Bypass transparent on last signplaceholder</label>
+				<br>
+				<br>
+				<input type="checkbox" id="ctrans" class="default-font" title="Takes full transparent with color codes instead of turning it into 0000."></input>
+				<label class="default-font">Retain color value even if transparent</label>
+				<br>
+				<br>
+			</div>
+		</div>
 
-    </body>
-    
-    <script>
-        var ready = true
+	</body>
+	
+	<script>
+		var ready = true
 
-        //Util credits from people on stackoverflow
-        function componentToHex(c) {
-            var hex = c.toString(16);
-            return hex.length == 1 ? "0" + hex : hex;
-        }
-        
-        function hexEnd0(v) {
-            for(var i=0;i<16;i++){
-                if(v == i * 17) {
-                    return true;
-                }
-            }
-            return false;
-        }
+		//Util credits from people on stackoverflow
+		function componentToHex(c) {
+			var hex = c.toString(16);
+			return hex.length == 1 ? "0" + hex : hex;
+		}
+		
+		function hexEnd0(v) {
+			for(var i=0;i<16;i++){
+				if(v == i * 17) {
+					return true;
+				}
+			}
+			return false;
+		}
+		function rgbaToHex(r, g, b, a, TransparentCheck) {
+			//very bad coding here
+			r = Math.min(r,255);
+			g = Math.min(g,255);
+			b = Math.min(b,255);
+			a = Math.min(a,255);
 
-        function rgbaToHex(r, g, b, a) {
-            //very bad coding here
-            r = Math.min(r,255);
-            g = Math.min(g,255);
-            b = Math.min(b,255);
-            a = Math.min(a,255);
+			if(a == 0 && !document.getElementById("ctrans").checked && TransparentCheck) {
+				return "0000";
+			}
 
-            if(a == 0 && !document.getElementById("ctrans").checked) {
-                return "0000";
-            }
+			if(hexEnd0(r) && hexEnd0(g) && hexEnd0(b)) {
+				if (a == 255) {
+					return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1);
+				}
+				else{
+					if(hexEnd0(a)){
+						return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1) + componentToHex(a).substring(0, 1);
+					}
+				}
+			}
+			if(a == 255){
+				return componentToHex(r) + componentToHex(g) + componentToHex(b)
+			}
+			return componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
+		}
 
-            if(hexEnd0(r) && hexEnd0(g) && hexEnd0(b)) {
-                if (a == 255) {
-                    return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1);
-                }
-                else{
-                    if(hexEnd0(a)){
-                        return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1) + componentToHex(a).substring(0, 1);
-                    }
-                }
-            }
-            if(a == 255){
-                return componentToHex(r) + componentToHex(g) + componentToHex(b)
-            }
-            return componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
-        }
+		function compressColor(c)
+		{
+			return [
+				Math.round(c[0] / 17) * 17,
+				Math.round(c[1] / 17) * 17,
+				Math.round(c[2] / 17) * 17,
+				Math.round(c[3] / 17) * 17,
+			]
+		}
 
-        function rgbaToHexNoTransparentCheck(r, g, b, a) {
-            r = Math.min(r,255);
-            g = Math.min(g,255);
-            b = Math.min(b,255);
-            a = Math.min(a,255);
-            if(hexEnd0(r) && hexEnd0(g) && hexEnd0(b)) {
-                if (a == 255) {
-                    return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1);
-                }
-                else{
-                    if(hexEnd0(a)){
-                        return componentToHex(r).substring(0, 1) + componentToHex(g).substring(0, 1) + componentToHex(b).substring(0, 1) + componentToHex(a).substring(0, 1);
-                    }
-                }
-            }
+		//
 
-            if(a == 255){
-                return componentToHex(r) + componentToHex(g) + componentToHex(b)
-            }
-            return componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
-        }
-        //
+		//button callback
+		function generate(){
+			let outputText = document.getElementById("output");
+			outputText.value = "";
 
-        //button callback
-        function generate(){
-            let outputText = document.getElementById("output");
-            let generatingtext = document.getElementById("generating");
-            outputText.value = "";
+			let generatingtext = document.getElementById("generating");
+			generatingtext.style.display = "initial";
+			generatingtext.innerHTML = "Generating...";
+			
+			if (ready && document.getElementById("input").files.length == 1) {
+				ready = false
+				let reader = new FileReader();
+				let f = document.getElementById("input").files[0];
 
-            generatingtext.style.display = "initial";
-            
-            if (ready && document.getElementById("input").files.length == 1 && document.getElementById("srcX").value > 0 && document.getElementById("srcY").value > 0) {
-                ready = false
-                let reader = new FileReader();
-                let f = document.getElementById("input").files[0];
-                reader.onload = function(a) 
-                {
-                    let img = new Image;
-                    img.onload = function() { 
-                        if(img.height <= 255 && img.width <= 255 && !document.getElementById("checkboxlegacy").checked){
-                            document.getElementById("output").value = drawFade(img); 
-                        }
-                        else
-                        {
-                            document.getElementById("output").value = drawLegacy(img); 
-                        }
-                        generatingtext.style.display = "none";
-                        ready = true
-                    } ;
-                    img.src = a.target.result;
-                }
-                reader.readAsDataURL(f);
-            }
-            else
-            {
-                generatingtext.style.display = "none";
-            }
-            
-            
-        }
+				reader.onload = function(a) 
+				{
+					let img = new Image;
+					img.onload = function() { 
 
-        function stepsize(x)
-        {
-            return Math.ceil(Math.min(x, 256) / 128) * 128;
-        }
+						if(img.height <= 255 && img.width <= 255 && !document.getElementById("checkboxlegacy").checked){
+							generatingtext.innerHTML = "Generated!";
+							outputText.value = drawFade(img); 
+						}
+						else
+						{
+							generatingtext.innerHTML = "Generated (legacy)!";
+							outputText.value = drawLegacy(img); 
+						}
 
-        function compressColor(c)
-        {
-            return [
-                Math.round(c[0] / 17) * 17,
-                Math.round(c[1] / 17) * 17,
-                Math.round(c[2] / 17) * 17,
-                Math.round(c[3] / 17) * 17,
-            ]
-        }
+						ready = true
+					} ;
+					img.src = a.target.result;
+				}
 
-        function drawFade(image) {
-            let img = document.createElement('canvas');
-            img.width = image.width + 2;
-            img.height = image.height + 2;
-            context2d = img.getContext('2d');
-            context2d.drawImage(image, 0,0);
-            let greenIndex = Math.min(Math.max(parseInt(document.getElementById("greenIndex").value, 16), 0), 255);
-            if(isNaN(greenIndex)){
-                greenIndex = 170;
-            }
-            let fixsize = [stepsize(image.width), stepsize(image.height)];
-            let srcDirectory = document.getElementById("srcPath").value;
-            let srcSize = [document.getElementById("srcX").value, document.getElementById("srcY").value];
-            let directives = "?crop=;0;0;1;1?setcolor=fff?replace;0000=" + rgbaToHexNoTransparentCheck(0, greenIndex, 0, 0) + ";fff0=" + rgbaToHexNoTransparentCheck(0, greenIndex, 0, 0) + ";fff=" + rgbaToHexNoTransparentCheck(0, greenIndex, 0, 0) + "?scalenearest=2?blendscreen=/objects/outpost/customsign/signplaceholder.png"
-            
-            //setgradient
-            directives += //"?replace;0a00=" + rgbaToHexNoTransparentCheck(0, 170, 0,0) +
-                        "?replace;" + rgbaToHexNoTransparentCheck(1, greenIndex, 0, 0) + "=" + rgbaToHexNoTransparentCheck(fixsize[0], greenIndex, 0,0) +
-                        ";" + rgbaToHexNoTransparentCheck(0, greenIndex, 1, 0) + "=" + rgbaToHexNoTransparentCheck(0, greenIndex, fixsize[1], 0) +
-                        ";" + rgbaToHexNoTransparentCheck(1, greenIndex, 1, 0) + "=" + rgbaToHexNoTransparentCheck(fixsize[0], greenIndex, fixsize[1], 0);
+				reader.readAsDataURL(f);
+			}
+			else
+			{
+				generatingtext.style.display = "none";
+			}
+			
+			
+		}
 
-            //setoptimizedsize
-            directives += "?scale=" + (fixsize[0]) + ";" + (fixsize[1]); 
-            //size
-            directives += "?crop=" + Math.round(fixsize[0]/512) + ";" + Math.round(fixsize[1]/512) + ";" + (image.width + Math.round(fixsize[0]/512)) + ";" + (image.height + Math.round(fixsize[1]/512));
+		function drawFade(image, options) {
+			let img = document.createElement('canvas');
+			img.width = options ? options.width : image.width;
+			img.height = options ? options.height : image.height;
 
-            let palletes = ""
-            for(let sx = 1; sx <= image.width + 1; sx++)
-            {
-                for(let sy = 1; sy <= image.height + 1; sy++)
-                {
-                    let ssx = sx - 1
-                    let ssy = image.height - sy
-                    let pix = context2d.getImageData(ssx, ssy, 1, 1).data;
-                    if (pix[3] > 0){ 
-                        if (document.getElementById("checkboxcompresscolor").checked){
-                            pix = compressColor(pix)
-                        }
-                        palletes += ";" + rgbaToHexNoTransparentCheck(sx - Math.round(fixsize[0]/256), greenIndex, sy - Math.round(fixsize[1]/256),0) + "=" + rgbaToHex(pix[0], pix[1], pix[2], pix[3]);
-                    }
-                    else{
-                    }
-                }
-            }
+			context2d = img.getContext('2d');
+			context2d.drawImage(image, -(options ? options.offset[0] : 0), -(options ? options.offset[1] : 0));
 
-            if(palletes == ""){
-                return srcDirectory;
-            }
+			let compressColors = document.getElementById("checkboxcompresscolor").checked;
 
-            return srcDirectory + directives + "?replace" + palletes;
-        }
+			let greenIndex = Math.min(Math.max(parseInt(document.getElementById("greenIndex").value, 16), 0), 255);
+			if(isNaN(greenIndex))
+			{
+				greenIndex = 0;
+			}
 
-        function drawLegacy(image) {
-            let img = document.createElement('canvas');
-            img.width = image.width;
-            img.height = image.height;
-            context2d = img.getContext('2d');
-            context2d.drawImage(image, 0, 0, image.width, image.height);
-            
-            let srcDirectory = document.getElementById("srcPath").value;
-            let srcSize = [document.getElementById("srcX").value, document.getElementById("srcY").value];
-            
-            let signSize = [32, 8];
-            let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
-            let signColors = [["00000001"]];
+			let directives = "?crop=;0;0;2;2?setcolor=fff?replace;fff0=fff?blendmult=/ai/ai.png;4;10"
+			
+			//setgradient
+			directives +=   "?replace;000f=" + rgbaToHex(0, greenIndex, 0,0) +
+							";094d33ff=" + rgbaToHex(img.width - 1, greenIndex, 0,0) +
+							";58472dff=" + rgbaToHex(0, greenIndex, img.height - 1, 0) +
+							";0d583bff=" + rgbaToHex(img.width - 1, greenIndex, img.height - 1, 0);
 
-            for(let x=1;x<=signSize[0];x++){
-                signColors[x] = [];
-                for(let y=1;y<=signSize[1];y++){
-                    signColors[x][y] = "";
-                    if(x < 10){ signColors[x][y] += "0" + x; } else { signColors[x][y] += x;}
-                    signColors[x][y] += "00";
-                    if(y < 10){ signColors[x][y] += "0" + y; } else { signColors[x][y] += y;}
-                    signColors[x][y] += "01";
-                }
-            }
-            //directives init
-            let directives = "?setcolor=ffff?replace;0000=ffff;fff0=ffff?scalenearest=" + (image.width / srcSize[0]) + ";" + (image.height / srcSize[1]);
-            
-            //calculates how much signs to be place x y
-            signs = [
-                Math.ceil(image.width / signSize[0]),
-                Math.ceil(image.height / signSize[1]),
-            ]
+			//setoptimizedsize
+			directives += "?scale=" + img.width + ";" + img.height; 
+			//size
+			directives += "?crop=1;1;" + (img.width + 1) + ";" + (img.height + 1);
 
-            //iterate sign blocks
-            for(let sy = 0; sy < signs[1];sy++){
-                for(let sx = 0; sx < signs[0];sx++){
+			let palettes = ""
 
-                    //gets sign relative position to the image
-                    let spos = [sx * signSize[0], sy * signSize[1]];
+			for(let x = 0; x < img.width; x++)
+			{
+				for(let y = 0; y < img.height; y++)
+				{
+					let c = context2d.getImageData(x, img.height - y - 1, 1, 1).data;
 
-                    //new sign
-                    let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]);
-                    let palletes = "?replace";
-                    hasColor = false;
-                    
-                    //iterate pixels + sign blocks
-                    for(let x=0; x<signSize[0];x++) 
-                    {
-                        for(let y=0; y<signSize[1];y++)
-                        {
-                            if (image.height > (spos[1] + y) && image.width > (spos[0] + x))
-                            {
-                                //get pixel from pos
-                                let pix = context2d.getImageData(spos[0] + x, image.height - (spos[1] + y + 1) , 1, 1).data;
+					if (c[3] > 0){ 
+						if (compressColors){
+							c = compressColor(c)
+						}
+						palettes += ";" + rgbaToHex(x, greenIndex, y, 0) + "=" + rgbaToHex(c[0], c[1], c[2], c[3], true);
+					}
+				}
+			}
 
-                                if(pix[3] > 0 || document.getElementById("ctrans").checked) {
-                                    hasColor = true;
-                                }
+			if(document.getElementById("checkboxpixelmapdata").checked){
+				return "?replace" + palettes;
+			}
 
-                                // avoids image corruption
-                                if(pix[3] == 1 && pix[1] == 0 && pix[0] < 33 && pix[2] < 9)
-                                {
-                                    pix[3] = 2;
-                                }
+			let srcDirectory = document.getElementById("srcPath").value;
+			if(palettes == ""){
+				return srcDirectory;
+			}
+			return srcDirectory + directives + "?replace" + palettes;
+		}
 
-                                //avoids the full white to be removed after processing and it will be restored
-                                if (pix[0] == 255 && pix[1] == 255 && pix[2] == 255 && pix[3] == 255) {
-                                    pix = [01,02,01,01]; 
-                                }
+		function drawLegacy(image) {
+			let img = document.createElement('canvas');
+			img.width = image.width;
+			img.height = image.height;
 
-                                //apply pixel
-                                if(sx + 1==signs[0] && sy + 1==signs[1] && pix[3] == 0 && document.getElementById("btrans").checked){
-                                    if (document.getElementById("checkboxcompresscolor").checked){
-                                        pix = compressColor(pix)
-                                    }
-                                    palletes += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
-                                }
-                                else
-                                {
-                                    if (document.getElementById("checkboxcompresscolor").checked){
-                                        pix = compressColor(pix)
-                                    }
-                                    palletes += ";" + signColors[x + 1][y + 1] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
-                                }
-                            }
-                        }
-                    }
-                    if (hasColor && palletes != "?replace"){
-                        directives += sign + palletes;
-                    }
-                }
-            }
-            
-            //final processing
-            directives += "?replace;ffff=0000;01020101=ffff";
-            return srcDirectory + directives;
-        }
+			context2d = img.getContext('2d');
+			context2d.drawImage(image, 0, 0, image.width, image.height);
+			
+			let srcDirectory = document.getElementById("srcPath").value;
+			
+			let signSize = [32, 8];
+			let signDirectory = "/objects/outpost/customsign/signplaceholder.png";
+			let signColors = [["00000000"]];
 
+			let btrans = document.getElementById("btrans").checked;
+			let ctrans = document.getElementById("ctrans").checked;
+			let compressColors = document.getElementById("checkboxcompresscolor").checked;
 
-        function lerp(a,b,r)
-        {
-            return a+(b-a)*r;
-        }
+			for(let x=1;x<=signSize[0];x++){
+				signColors[x] = [];
+				for(let y=1;y<=signSize[1];y++){
+					let xx = (x+"");
+					let yy = (x+"");
+					if(x<10)
+						xx = "0"+x;
+					if(y<10)
+						yy = "0"+y;
 
-        var speed = 1/16;
+					signColors[x-1][y-1] = xx + "00" + yy + "00"
+				}
+			}
+			//directives init
+			let directives = "?crop=;0;0;1;1?setcolor=fff?replace;fff=ffffff02;fff0=ffffff02?scalenearest=" + image.width + ";" + image.height;
+			
+			//calculates how much signs to be place x y
+			let signs = [
+				Math.ceil(image.width / signSize[0]),
+				Math.ceil(image.height / signSize[1]),
+			]
 
-        var lastColor = [0, 212, 219];
-        var targetColor = [70, 112, 16];
-            
-        var current_lastColor = [0, 0, 0];
-        var current_targetColor = [0, 0, 0];
+			//iterate sign blocks
+			for(let sy = 0; sy < signs[1];sy++){
+				for(let sx = 0; sx < signs[0];sx++){
 
-        function tick()
-        {
-            current_lastColor = [lerp(current_lastColor[0], lastColor[0], speed), lerp(current_lastColor[1], lastColor[1], speed), lerp(current_lastColor[2], lastColor[2], speed)];
-            current_targetColor = [lerp(current_targetColor[0], targetColor[0], speed), lerp(current_targetColor[1], targetColor[1], speed), lerp(current_targetColor[2], targetColor[2], speed)];
-            document.body.style.backgroundImage = "linear-gradient(90deg, rgb("+current_targetColor[0]+","+current_targetColor[1]+","+current_targetColor[2]+"),rgb("+current_lastColor[0]+","+current_lastColor[1]+","+current_lastColor[2]+"))";
-        }
+					//gets sign relative position to the image
+					let spos = [sx * signSize[0], sy * signSize[1]];
 
-        function tick2()
-        {
-            lastColor = targetColor;
-            targetColor = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
-        }
+					//new sign
+					let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]);
+					let palettes = "?replace";
+					hasColor = false;
+					
+					//iterate pixels + sign blocks
+					for(let x=0; x<signSize[0];x++) 
+					{
+						for(let y=0; y<signSize[1];y++)
+						{
+							if (image.height > (spos[1] + y) && image.width > (spos[0] + x))
+							{
+								//get pixel from pos
+								let pix = context2d.getImageData(spos[0] + x, image.height - (spos[1] + y + 1) , 1, 1).data;
 
-        tick();
-        tick2();
+								if(pix[3] > 0 || ctrans) {
+									hasColor = true;
+								}
 
-        setInterval(tick2,5000);
-        setInterval(tick,64);
-    </script>
+								//apply pixel
+								if(sx + 1==signs[0] && sy + 1==signs[1] && pix[3] == 0 && btrans){
+									if (compressColors){
+										pix = compressColor(pix)
+									}
+									palettes += ";" + signColors[x][y] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+								}
+								else
+								{
+									if (compressColors){
+										pix = compressColor(pix)
+									}
+									palettes += ";" + signColors[x][y] + "=" + rgbaToHex(pix[0],pix[1],pix[2],pix[3]);
+								}
+							}
+						}
+					}
+					if (hasColor && palettes != "?replace"){
+						directives += sign + palettes;
+					}
+				}
+			}
+			
+			//final processing
+			return srcDirectory + directives;
+		}
+
+		//web visuals
+
+		function lerp(a,b,r)
+		{
+			return a+(b-a)*r;
+		}
+
+		var speed = 1/16;
+
+		var lastColor = [0, 212, 219];
+		var targetColor = [70, 112, 16];
+			
+		var current_lastColor = [0, 0, 0];
+		var current_targetColor = [0, 0, 0];
+
+		function tick()
+		{
+			current_lastColor = [lerp(current_lastColor[0], lastColor[0], speed), lerp(current_lastColor[1], lastColor[1], speed), lerp(current_lastColor[2], lastColor[2], speed)];
+			current_targetColor = [lerp(current_targetColor[0], targetColor[0], speed), lerp(current_targetColor[1], targetColor[1], speed), lerp(current_targetColor[2], targetColor[2], speed)];
+			document.body.style.backgroundImage = "linear-gradient(90deg, rgb("+current_targetColor[0]+","+current_targetColor[1]+","+current_targetColor[2]+"),rgb("+current_lastColor[0]+","+current_lastColor[1]+","+current_lastColor[2]+"))";
+		}
+
+		function tick2()
+		{
+			lastColor = targetColor;
+			targetColor = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
+		}
+
+		tick();
+		tick2();
+
+		setInterval(tick2,5000);
+		setInterval(tick,64);
+	</script>
 </html> 
