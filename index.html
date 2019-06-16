@@ -195,7 +195,7 @@
 					let img = new Image;
 					img.onload = function() { 
 
-						if(img.height <= 255 && img.width <= 255 && !document.getElementById("checkboxlegacy").checked){
+						if(img.height <= 256 && img.width <= 256 && !document.getElementById("checkboxlegacy").checked){
 							generatingtext.innerHTML = "Generated!";
 							outputText.value = drawFade(img); 
 						}
@@ -236,13 +236,13 @@
 				greenIndex = 0;
 			}
 
-			let directives = "?crop=;0;0;2;2?setcolor=fff?replace;fff0=fff?blendmult=/ai/ai.png;4;10"
+			let directives = "?crop;0;0;1;1?setcolor=fff?replace=fff0=fff?border=1;f00;00f?crop;0;0;2;2?scanlines=000;0.5;fff;0.5"
 			
 			//setgradient
-			directives +=   "?replace;000f=" + rgbaToHex(0, greenIndex, 0,0) +
-							";094d33ff=" + rgbaToHex(img.width - 1, greenIndex, 0,0) +
-							";58472dff=" + rgbaToHex(0, greenIndex, img.height - 1, 0) +
-							";0d583bff=" + rgbaToHex(img.width - 1, greenIndex, img.height - 1, 0);
+			directives +=   "?replace;0000bc=" + rgbaToHex(0, greenIndex, 0,0) +
+							";bc0000=" + rgbaToHex(img.width, greenIndex, 0,0) +
+							";ffbcbc=" + rgbaToHex(0, greenIndex, img.height - 1, 0) +
+							";fff=" + rgbaToHex(img.width - 1, greenIndex, img.height - 1, 0);
 
 			//setoptimizedsize
 			directives += "?scale=" + img.width + ";" + img.height; 
