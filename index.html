@@ -338,8 +338,9 @@
 		//drawable
 		function drawFade(image, options)
 		{
-			let img = document.createElement('canvas');
 			options = options ? options : {};
+
+			let img = document.createElement('canvas');
 			img.width = options.width ? options.width : image.width;
 			img.height = options.height ? options.height : image.height;
 			
@@ -361,19 +362,37 @@
 			baseDirectives +=
 				"?replace" +
 				";fbfbfb=" + rgbaToHex(0, greenIndex, 0,255) +
-				";eaeaea=" + rgbaToHex(img.width-1, greenIndex, 0,255) +
-				";e4e4e4=" + rgbaToHex(0, greenIndex, img.height-1, 255) +
-				";6a6a6a=" + rgbaToHex(img.width-1, greenIndex, img.height-1, 255);
+				";eaeaea=" + rgbaToHex(img.width, greenIndex, 0,255) +
+				";e4e4e4=" + rgbaToHex(0, greenIndex, img.height, 255) +
+				";6a6a6a=" + rgbaToHex(img.width, greenIndex, img.height, 255);
 
-			//setoptimizedsize
+			//scalefade
 			baseDirectives += "?multiply=fff0";
-			baseDirectives += "?scale=" + img.width;
+			baseDirectives += "?scale=" + (img.width - 0.5);
 			if(img.width != img.height)
 			{
-				baseDirectives += ";" + img.height;
+				baseDirectives += ";" + (img.height - 0.5);
 			}
-			//size
-			baseDirectives += "?crop=1;1;" + (img.width + 1) + ";" + (img.height + 1);
+
+			//crop left overs
+			let crop = [
+				0,0,
+				img.width, img.height
+			]
+
+			if(img.width > 255)
+			{
+				crop[0] += 1;
+				crop[2] += 1;
+			}
+
+			if(img.height > 255)
+			{
+				crop[1] += 1;
+				crop[3] += 1;
+			}
+			
+			baseDirectives += "?crop=" + crop.join(";");
 
 
 			//palettes tags
@@ -398,7 +417,11 @@
 							colorData = compressColor(colorData)
 						}
 						let colorHex = rgbaToHex(colorData[0], colorData[1], colorData[2], colorData[3]);
-						pixelData +=  ";" + rgbaToHexNoTransparentCheck(x, greenIndex, y,0) + "=" + (toReplace[colorHex] != null ? toReplace[colorHex] : colorHex);
+
+						pixelData +=  ";" 
+								+ rgbaToHexNoTransparentCheck(x, greenIndex, y,0) 
+								+ "=" 
+								+ (toReplace[colorHex] != null ? toReplace[colorHex] : colorHex); //use palette tags or original color
 					}
 				}
 			}
