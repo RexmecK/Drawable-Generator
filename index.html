@@ -446,7 +446,7 @@
 			return palettes;
 		}
 
-		function palettesSubstitutes(palettes, greenIndex)
+		function palettesSubstitutes(palettes, greenIndex, replaceTransparents)
 		{
 			let replaces = {};
 			let Index = [0, 0, 0, 15];
@@ -485,14 +485,14 @@
 
 			for(var color in palettes)
 			{
-				if(color.length > 4 && palettes[color] > 3)
+				if((color.length > 4 || ((color[3] == 0) && replaceTransparents)) && palettes[color] > 3) // || color[3] == 0
 				{
-					replaces[color] = rgbaToHex(Index[0]*17,Index[1]*17,Index[2]*17,Index[3]*17, true);
+					replaces[color] = rgbaToHex(Index[0]*17,Index[1]*17,Index[2]*17,Index[3]*17);
 					incrementIndex();
 					if(stop){break}
 
 					//skip existing palettes
-					while(palettes[rgbaToHex(Index[0]*17,Index[1]*17,Index[2]*17,Index[3]*17, true)])
+					while(palettes[rgbaToHex(Index[0]*17,Index[1]*17,Index[2]*17,Index[3]*17)])
 					{
 						incrementIndex();
 						if(stop){break}
@@ -578,7 +578,7 @@
 
 			//palettes substitute replace longer with a shorter one temporarily
 			let toReplace = {};
-			if(!options.compressColor)
+			if(!options.compressColor && !options.disablePalettesSubstitutes)
 			{
 				toReplace = palettesSubstitutes(palettesCount(image), greenIndex);
 			}
@@ -668,9 +668,9 @@
 
 			//palettes tags
 			let toReplace = {};
-			if(!options.compressColor)
+			if(!options.compressColor && !options.disablePalettesSubstitutes)
 			{
-				toReplace = palettesSubstitutes(palettesCount(image), 0);
+				toReplace = palettesSubstitutes(palettesCount(image), 0, true);
 			}
 
 			//iterate sign blocks
@@ -684,7 +684,7 @@
 					//new sign
 					let sign = "?blendmult=" + signDirectory + ";" + (-sx * signSize[0]) + ";" + -(sy * signSize[1]);
 					let palettes = "?replace";
-					hasColor = false;
+					let hasColor = false;
 					
 					//iterate pixels + sign blocks
 					for(let x=0; x<signSize[0];x++)
@@ -701,28 +701,25 @@
 									hasColor = true;
 								}
 
+								if (compressColors)
+								{
+									colorData = compressColor(colorData)
+								}
+
 								//apply pixel
 								if(sx + 1==signs[0] && sy + 1==signs[1] && colorData[3] == 0 && bypassTransparentLastSign){
-									if (compressColors)
-									{
-										colorData = compressColor(colorData)
-									}
 									let colorHex = rgbaToHex(colorData[0],colorData[1],colorData[2],colorData[3]);
 									palettes += ";" + signColors[x][y] + "=" + (toReplace[colorHex] != null ? toReplace[colorHex] : colorHex);
 								}
 								else
 								{
-									if (compressColors)
-									{
-										colorData = compressColor(colorData)
-									}
 									let colorHex = rgbaToHex(colorData[0],colorData[1],colorData[2],colorData[3]);
 									palettes += ";" + signColors[x][y] + "=" + (toReplace[colorHex] != null ? toReplace[colorHex] : colorHex);
 								}
 							}
 						}
 					}
-					if (hasColor && palettes != "?replace")
+					if (hasColor && (palettes != "?replace"))
 					{
 						directives += sign + palettes;
 					}
