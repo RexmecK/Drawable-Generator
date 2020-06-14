@@ -283,7 +283,12 @@
 
 		function rgbaToHex(r, g, b, a, NoTransparentCheck)
 		{
-			let rgba = [r,g,b,a]
+			let rgba = [
+				Math.min(r, 255),
+				Math.min(g, 255),
+				Math.min(b, 255),
+				Math.min(a, 255)
+			]
 			if((a == null) || (a == 255))
 				rgba.pop()
 			
