@@ -37,11 +37,22 @@ function readfile(file)
 			let output = "";
 			if(img.height <= 256 && img.width <= 256 && !document.getElementById("checkboxlegacy").checked){
 				generatingtext.innerHTML = "Generated!";
-				output = generateDrawableFromImage(
-					"fade",
-					img,
-					options
-				);
+				if (document.getElementById("checkboxsignmap").checked)
+				{
+					output = generateDrawableFromImage(
+						"signmap",
+						img,
+						options
+					);
+				}
+				else
+				{
+					output = generateDrawableFromImage(
+						"fade",
+						img,
+						options
+					);
+				}
 			}
 			else
 			{

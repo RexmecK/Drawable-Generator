@@ -240,7 +240,7 @@ types.fade = function(image, options)
             {
                 color = nullifyrgba(color);
             }
-            
+
 			if (color[3] > 0 || options.retainColorValue)
 			{
 				if (options.compressColor)
@@ -374,6 +374,137 @@ types.legacy = function(image, options)
 	}
 	
 	//final processing
+	return srcImageDirectory + directives + palettesSubstitutesToOriginal(toReplace);
+}
+
+types.signmap = function(image, options)
+{
+	let img = document.createElement('canvas');
+	img.width = image.width;
+	img.height = image.height;
+	context2d = img.getContext('2d');
+	context2d.drawImage(image, 0, 0, image.width, image.height);
+	let srcImageDirectory = options.imagePath ? options.imagePath : "/assetmissing.png";
+	let signSize = options.signSize ? options.signSize : [32, 8];
+	let signDirectory = options.signDirectory ? options.signDirectory : "/objects/outpost/customsign/signplaceholder.png";
+
+    let directives = ""
+    directives += "?crop=;0;0;1;1?setcolor=fff?replace;fff=fff0"
+    directives += "?scalenearest=" + image.width + ";" + image.height;
+
+    // signmapped = { "pos":[0,0], "palettes":[{"pos":[0,0], "color": "000"}] }
+    let signmap = [];
+
+    
+	let toReplace = {};
+	if(!options.compressColor && !options.disablePalettesSubstitutes)
+	{
+		toReplace = palettesSubstitutes(palettesCount(image), 0, options.retainColorValue);
+	}
+
+	let signs = [
+		Math.ceil(image.width / signSize[0]),
+		Math.ceil(image.height / signSize[1]),
+	]
+
+	for(let sy = 0; sy < signs[1];sy++)
+	{
+		for(let sx = 0; sx < signs[0];sx++)
+		{
+			//gets sign position in the image
+			let spos = [sx * signSize[0], sy * signSize[1]];
+
+			//new sign
+            //{"pos":[0,0], "color": "000"}
+			let palettes = [];
+			let hasColor = false;
+			
+			//iterate pixels + sign blocks
+			for(let x=0; x<signSize[0];x++)
+			{
+				for(let y=0; y<signSize[1];y++)
+				{
+					if (image.height > (spos[1] + y) && image.width > (spos[0] + x))
+					{
+						//get pixel from pos
+						let colorData = context2d.getImageData(spos[0] + x, image.height - (spos[1] + y + 1) , 1, 1).data;
+
+                        if (!options.retainColorValue)
+                        {
+                            colorData = nullifyrgba(colorData);
+                        }
+
+						if(colorData[3] > 0)
+						{
+							hasColor = true;
+						}
+
+						if (options.compressColor)
+						{
+							colorData = preShortenColor(colorData)
+						}
+                        
+						//apply pixel
+						if(colorData[3] > 0 || options.retainColorValue){
+							let colorHex = rgbaToHex(colorData[0],colorData[1],colorData[2],colorData[3]);
+							palettes.push(
+                                {
+                                    pos: [x + 1,y + 1],
+                                    color: (toReplace[colorHex] != null ? toReplace[colorHex] : colorHex),
+                                }
+                            )
+						}
+					}
+				}
+			}
+			if (hasColor && (palettes.length > 0))
+			{
+                signmap.push(
+                    {
+                        pos: [-sx * signSize[0], -sy * signSize[1]], 
+                        palettes: palettes
+                    }
+                )
+			}
+		}
+	}
+
+    //build map
+	for(let i = 0; i < signmap.length; i++)
+    {
+        let sign = signmap[i];
+        directives += "?blendmult=/objects/outpost/customsign/signplaceholder.png;" + sign.pos[0] + ";" + sign.pos[1] + "?scanlines=0a0;0.001;0a0;0.001";
+    }
+
+    //build replaces
+    let replaceDirectives = "?replace"
+	for(let i = 0; i < signmap.length; i++)
+    {
+        let sign = signmap[i];
+        let greenindex = signmap.length - i;
+	    for(let c = 0; c < sign.palettes.length; c++)
+        {
+            let palette = sign.palettes[c]
+
+            let x = palette.pos[0]
+            let g = greenindex
+            let y = palette.pos[1]
+			let xx = (x+"");
+			let yy = (y+"");
+			if(x<10)
+				xx = "0"+x;
+			if(y<10)
+				yy = "0"+y;
+			let signColor = xx + stringToHex(greenindex) + yy + "00";
+
+            replaceDirectives += ";" + signColor + "=" + palette.color;
+        }
+    }
+    if(replaceDirectives != "?replace")
+    {
+        directives += replaceDirectives;
+    }
+
 	return srcImageDirectory + directives + palettesSubstitutesToOriginal(toReplace);
 }
 
